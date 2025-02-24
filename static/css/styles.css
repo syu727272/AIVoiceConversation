@@ -1,0 +1,48 @@
+.mic-container {
+    position: relative;
+    margin: 2rem 0;
+}
+
+.mic-icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.conversation-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    border-radius: 8px;
+    background: var(--bs-dark);
+}
+
+#transcript, #response {
+    text-align: left;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+#transcript {
+    color: var(--bs-info);
+}
+
+#response {
+    color: var(--bs-light);
+}
+
+.listening #micButton {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-info-rgb), 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--bs-info-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--bs-info-rgb), 0);
+    }
+}
