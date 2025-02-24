@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
+        recognition.lang = 'ja-JP';  // Changed to Japanese
     } else {
         showError('Speech recognition is not supported in your browser.');
     }
@@ -40,10 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
     recognition.onresult = async (event) => {
         const transcript = event.results[0][0].transcript;
         transcriptDiv.textContent = `Q: ${transcript}`;
-        
+
         try {
             statusDiv.textContent = 'Processing...';
-            
+
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: {
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            
+
             if (data.success) {
                 // Update conversation history
                 conversationHistory.push(
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Display response
                 responseDiv.textContent = `A: ${data.response}`;
-                
+
                 // Speak response
                 speakResponse(data.response);
             } else {

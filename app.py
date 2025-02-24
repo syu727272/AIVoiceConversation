@@ -22,37 +22,37 @@ def chat():
         data = request.json
         user_message = data.get('message', '')
         conversation_history = data.get('history', [])
-        
+
         # Prepare messages for OpenAI API
-        messages = [{"role": "system", "content": "You are a helpful assistant providing concise and informative answers."}]
-        
+        messages = [{"role": "system", "content": "あなたは親切なアシスタントで、日本語で簡潔で有益な回答を提供します。"}]
+
         # Add conversation history
         for msg in conversation_history:
             messages.append({
                 "role": "user" if msg["type"] == "question" else "assistant",
                 "content": msg["content"]
             })
-        
+
         # Add current message
         messages.append({"role": "user", "content": user_message})
-        
+
         # the newest OpenAI model is "gpt-4o" which was released May 13, 2024.
         response = openai.chat.completions.create(
             model="gpt-4o",
             messages=messages,
             max_tokens=150
         )
-        
+
         answer = response.choices[0].message.content
-        
+
         return jsonify({
             "success": True,
             "response": answer
         })
-        
+
     except Exception as e:
         logging.error(f"Error in chat endpoint: {str(e)}")
         return jsonify({
             "success": False,
-            "error": "An error occurred while processing your request."
+            "error": "リクエストの処理中にエラーが発生しました。"
         }), 500
