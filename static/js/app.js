@@ -31,31 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (synthesizer.onvoiceschanged !== undefined) {
         synthesizer.onvoiceschanged = populateVoiceList;
     }
-    popu// Populate voice list
-function populateVoiceList() {
-    const voiceSelect = document.getElementById('voiceSelect');
-    const voices = speechSynthesis.getVoices();
-    
-    // Filter for Japanese voices only
-    const japaneseVoices = voices.filter(voice => 
-        voice.lang.startsWith('ja-JP') || 
-        voice.name.includes('Japanese')
-    );
-
-    voiceSelect.innerHTML = '<option value="">音声を選択してください</option>';
-    
-    japaneseVoices.forEach(voice => {
-        const option = document.createElement('option');
-        option.value = voice.name;
-        option.textContent = voice.name;
-        voiceSelect.appendChild(option);
-    });
-}
-
-// Handle voice list population
-if (speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoiceList;
-}
+    populateVoiceList();
 
     // Initialize speech recognition
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
