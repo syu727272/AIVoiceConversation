@@ -7,10 +7,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const transcriptDiv = document.getElementById('transcript');
     const responseDiv = document.getElementById('response');
     const errorDiv = document.getElementById('error');
+    const voiceSelect = document.getElementById('voiceSelect');
 
     let recognition = null;
     let synthesizer = window.speechSynthesis;
     let conversationHistory = [];
+    let voices = [];
+
+    // Initialize voice selection
+    function populateVoiceList() {
+        voices = synthesizer.getVoices().filter(voice => voice.lang.startsWith('ja')); // Filter Japanese voices
+        voiceSelect.innerHTML = '<option value="">音声を選択してください</option>';
+
+        voices.forEach((voice, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.textContent = `${voice.name} (${voice.lang})`;
+            voiceSelect.appendChild(option);
+        });
+    }
+
+    // Handle voice list changes
+    if (synthesizer.onvoiceschanged !== undefined) {
+        synthesizer.onvoiceschanged = populateVoiceList;
+    }
+    populateVoiceList();
 
     // Initialize speech recognition
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
@@ -24,17 +45,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Speech recognition event handlers
     recognition.onstart = () => {
-        statusDiv.textContent = 'Listening...';
+        statusDiv.textContent = '聞いています...';
         micButton.classList.add('listening');
     };
 
     recognition.onend = () => {
-        statusDiv.textContent = 'Click the microphone to start';
+        statusDiv.textContent = 'マイクをクリックして開始';
         micButton.classList.remove('listening');
     };
 
     recognition.onerror = (event) => {
-        showError(`Error occurred in recognition: ${event.error}`);
+        showError(`音声認識エラー: ${event.error}`);
     };
 
     recognition.onresult = async (event) => {
@@ -42,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         transcriptDiv.textContent = `Q: ${transcript}`;
 
         try {
-            statusDiv.textContent = 'Processing...';
+            statusDiv.textContent = '処理中...';
 
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -70,10 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Speak response
                 speakResponse(data.response);
             } else {
-                showError(data.error || 'An error occurred');
+                showError(data.error || 'エラーが発生しました');
             }
         } catch (error) {
-            showError('Failed to get response from server');
+            showError('サーバーからの応答に失敗しました');
         }
     };
 
@@ -84,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 recognition.start();
                 hideError();
             } catch (error) {
-                showError('Failed to start speech recognition');
+                showError('音声認識の開始に失敗しました');
             }
         }
     });
@@ -92,8 +113,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Speech synthesis function
     function speakResponse(text) {
         const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+
+        // Use selected voice if available
+        const selectedVoiceIndex = voiceSelect.value;
+        if (selectedVoiceIndex !== '' && voices[selectedVoiceIndex]) {
+            utterance.voice = voices[selectedVoiceIndex];
+        }
+
         utterance.onend = () => {
-            statusDiv.textContent = 'Click the microphone to start';
+            statusDiv.textContent = 'マイクをクリックして開始';
         };
         synthesizer.speak(utterance);
     }
